@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - rel/*
+  pull_request:
+    branches:
+      - master
+      - develop
+      - rel/*
+
+name: Rust
+
+env:
+  RUSTFLAGS: "-Dwarnings"
+
+jobs:
+  lint-fmt-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up cargo cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Cargo check --all
+        run: cargo check
+
+      - name: Rustfmt
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --all --all-targets --all-features
+
+      - name: Test
+        run: cargo test --all --all-features

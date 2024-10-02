@@ -1,0 +1,43 @@
+[workspace]
+members = ["examples/*"]
+
+[workspace.dependencies]
+eframe = { version = "0.29.1", default-features = false, features = [
+    "glow",
+    "persistence",
+] }
+
+[package]
+name = "egui-modal-spinner"
+description = "A modal spinner to temporarily suppress user input in egui"
+version = "0.1.0"
+edition = "2021"
+authors = ["fluxxcode"]
+repository = "https://github.com/fluxxcode/egui-modal-spinner"
+homepage = "https://github.com/fluxxcode/egui-modal-spinner"
+readme = "README.md"
+license = "MIT"
+
+[dependencies]
+egui = "0.29.1"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+nursery = { level = "deny", priority = 0 }
+pedantic = { level = "deny", priority = 1 }
+enum_glob_use = { level = "deny", priority = 2 }
+perf = { level = "warn", priority = 3 }
+style = { level = "warn", priority = 4 }
+unwrap_used = { level = "deny", priority = 5 }
+expect_used = { level = "deny", priority = 6 }
+
+# These lints might be useful in the future but are not enabled for now
+struct_excessive_bools = { level = "allow", priority = 10 }
+return_self_not_must_use = { level = "allow", priority = 11 }
+must_use_candidate = { level = "allow", priority = 12 }
+struct_field_names = { level = "allow", priority = 13 }
+missing_fields_in_debug = { level = "allow", priority = 14 }
+missing_errors_doc = { level = "allow", priority = 15 }
+module_name_repetitions = { level = "allow", priority = 16 }

@@ -1,0 +1,8 @@
+[package]
+name = "sandbox"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+eframe = { workspace = true, features = ["serde", "ron"] }
+egui-modal-spinner = { path = "../../" }
