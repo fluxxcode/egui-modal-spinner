@@ -37,7 +37,7 @@ impl ModalSpinner {
 
             fill_color: egui::Color32::from_rgba_premultiplied(0, 0, 0, 120),
             spinner: Spinner::default(),
-            show_elapsed_time: false,
+            show_elapsed_time: true,
         }
     }
 
@@ -103,6 +103,23 @@ impl ModalSpinner {
     ///
     /// This has no effect if the `SpinnerState` is currently not `SpinnerState::Open`.
     pub fn update(&mut self, ctx: &egui::Context) {
+        self.update_ui(ctx, |_|());
+    }
+
+    /// Main update method of the spinner that should be called every frame if you want the
+    /// spinner to be visible.
+    /// This method allows additional content to be displayed under the
+    /// spinner - or if activated - under the elapsed time.
+    ///
+    /// This has no effect if the `SpinnerState` is currently not `SpinnerState::Open`.
+    pub fn update_with_content(&mut self, ctx: &egui::Context, ui: impl FnOnce(&mut egui::Ui)) {
+        self.update_ui(ctx, ui);
+    }
+}
+
+/// UI methods
+impl ModalSpinner {
+    fn update_ui(&self, ctx: &egui::Context, content: impl FnOnce(&mut egui::Ui)) {
         if !matches!(self.state, SpinnerState::Open(_)) {
             return;
         }
@@ -135,6 +152,8 @@ impl ModalSpinner {
                     if self.show_elapsed_time {
                         self.ui_update_elapsed_time(ui);
                     }
+
+                    content(ui);
                 });
             });
 
