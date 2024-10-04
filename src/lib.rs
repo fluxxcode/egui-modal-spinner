@@ -107,7 +107,7 @@ impl ModalSpinner {
     ///
     /// This has no effect if the `SpinnerState` is currently not `SpinnerState::Open`.
     pub fn update(&mut self, ctx: &egui::Context) {
-        self.update_ui(ctx, |_|());
+        self.update_ui(ctx, |_| ());
     }
 
     /// Main update method of the spinner that should be called every frame if you want the
@@ -132,7 +132,8 @@ impl ModalSpinner {
 
         ctx.style_mut(|s| s.visuals.window_fill = self.fill_color);
 
-        let re = self.area
+        let re = self
+            .area
             .movable(false)
             .fixed_pos(screen_rect.left_top())
             .show(ctx, |ui| {
@@ -167,7 +168,10 @@ impl ModalSpinner {
     fn ui_update_elapsed_time(&self, ui: &mut egui::Ui) {
         if let SpinnerState::Open(timestamp) = self.state {
             ui.add_space(ui.spacing().item_spacing.y);
-            ui.label(format!("Elapsed: {} s", timestamp.elapsed().unwrap_or_default().as_secs()));
+            ui.label(format!(
+                "Elapsed: {} s",
+                timestamp.elapsed().unwrap_or_default().as_secs()
+            ));
         }
     }
 }

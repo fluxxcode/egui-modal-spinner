@@ -34,7 +34,9 @@ struct MyApp {
 impl MyApp {
     pub fn new() -> Self {
         Self {
-            spinner: ModalSpinner::new().show_elapsed_time(true).spinner_size(24.0),
+            spinner: ModalSpinner::new()
+                .show_elapsed_time(true)
+                .spinner_size(24.0),
             result_recv: None,
             thread_state: None,
         }
@@ -70,7 +72,7 @@ impl MyApp {
                     }
 
                     self.thread_state = Some(state);
-                },
+                }
                 Err(err) => {
                     if err == TryRecvError::Disconnected {
                         self.spinner.close();
