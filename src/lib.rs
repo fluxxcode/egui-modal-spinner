@@ -131,10 +131,21 @@ impl ModalSpinner {
                     ui.add_space(screen_rect.height() / 2.0 - spinner_h / 2.0);
 
                     self.spinner.update(ui);
+
+                    if self.show_elapsed_time {
+                        self.ui_update_elapsed_time(ui);
+                    }
                 });
             });
 
         ctx.move_to_top(re.response.layer_id);
+    }
+
+    fn ui_update_elapsed_time(&self, ui: &mut egui::Ui) {
+        if let SpinnerState::Open(timestamp) = self.state {
+            ui.add_space(ui.spacing().item_spacing.y);
+            ui.label(format!("Elapsed: {} s", timestamp.elapsed().unwrap_or_default().as_secs()));
+        }
     }
 }
 

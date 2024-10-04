@@ -17,7 +17,7 @@ struct MyApp {
 impl MyApp {
     pub fn new() -> Self {
         Self {
-            spinner: ModalSpinner::new(),
+            spinner: ModalSpinner::new().show_elapsed_time(true),
             result_recv: None,
         }
     }
