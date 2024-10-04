@@ -1,7 +1,7 @@
 //! egui-modal-spinner
 #![warn(missing_docs)] // Let's keep the public API well documented!
 
-use std::{ops::{Div, Sub}, time::SystemTime};
+use std::time::SystemTime;
 
 use egui::Widget;
 
@@ -20,7 +20,7 @@ pub enum SpinnerState {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ModalSpinner {
     state: SpinnerState,
-    id: String,
+    id: egui::Id,
 
     fill_color: egui::Color32,
     spinner: Spinner,
@@ -33,12 +33,18 @@ impl ModalSpinner {
     pub fn new() -> Self {
         Self {
             state: SpinnerState::Closed,
-            id: String::from("_modal_spinner"),
+            id: egui::Id::from("_modal_spinner"),
 
             fill_color: egui::Color32::from_rgba_premultiplied(0, 0, 0, 120),
             spinner: Spinner::default(),
             show_elapsed_time: false,
         }
+    }
+
+    /// Sets the ID of the spinner.
+    pub fn id(mut self, id: impl Into<egui::Id>) -> Self {
+        self.id = id.into();
+        self
     }
 
     /// Sets the fill color of the modal background.
@@ -95,27 +101,36 @@ impl ModalSpinner {
             return;
         }
 
-        let window_fill = ctx.style().visuals.window_fill;
         let screen_rect = ctx.input(|i| i.screen_rect);
 
         ctx.style_mut(|s| s.visuals.window_fill = self.fill_color);
 
-        let re = egui::Window::new(&self.id)
-            .interactable(false)
-            .title_bar(false)
-            .fixed_size(screen_rect.size())
+        let re = egui::Area::new(self.id)
+            .interactable(true)
+            .movable(false)
             .fixed_pos(screen_rect.left_top())
+            .sense(egui::Sense::click())
             .show(ctx, |ui| {
-                ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                ui.painter()
+                    .rect_filled(screen_rect, egui::Rounding::ZERO, self.fill_color);
+
+                let child_ui = egui::UiBuilder::new()
+                    .max_rect(screen_rect)
+                    .layout(egui::Layout::top_down(egui::Align::Center));
+
+                ui.allocate_new_ui(child_ui, |ui| {
+                    let spinner_h = self
+                        .spinner
+                        .size
+                        .unwrap_or_else(|| ui.style().spacing.interact_size.y);
+
+                    ui.add_space(screen_rect.height() / 2.0 - spinner_h / 2.0);
+
                     self.spinner.update(ui);
                 });
             });
 
-        if let Some(re) = re {
-            ctx.move_to_top(re.response.layer_id);
-        }
-
-        ctx.style_mut(|s| s.visuals.window_fill = window_fill);
+        ctx.move_to_top(re.response.layer_id);
     }
 }
 
