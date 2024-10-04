@@ -5,6 +5,10 @@ use std::time::SystemTime;
 
 use egui::Widget;
 
+// TODO: Fix default modal fill color in white mode
+// TODO: Implement fade out
+// TODO: Implement progress bar
+
 /// Represents the state the spinner is currently in.
 #[derive(Debug, Clone, PartialEq)]
 pub enum SpinnerState {
