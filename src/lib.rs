@@ -10,7 +10,7 @@ use egui::Widget;
 // TODO: Implement progress bar
 
 /// Represents the state the spinner is currently in.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SpinnerState {
     /// The spinner is currently closed and not visible.
     Closed,
@@ -29,6 +29,12 @@ pub struct ModalSpinner {
     fill_color: egui::Color32,
     spinner: Spinner,
     show_elapsed_time: bool,
+}
+
+impl Default for ModalSpinner {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Creation methods
@@ -64,7 +70,7 @@ impl ModalSpinner {
     }
 
     /// Sets the size of the spinner.
-    pub fn spinner_size(mut self, size: f32) -> Self {
+    pub const fn spinner_size(mut self, size: f32) -> Self {
         self.spinner.size = Some(size);
         self
     }
@@ -76,7 +82,7 @@ impl ModalSpinner {
     }
 
     /// If the elapsed time should be displayed below the spinner.
-    pub fn show_elapsed_time(mut self, show_elapsed_time: bool) -> Self {
+    pub const fn show_elapsed_time(mut self, show_elapsed_time: bool) -> Self {
         self.show_elapsed_time = show_elapsed_time;
         self
     }
@@ -85,7 +91,7 @@ impl ModalSpinner {
 /// Getter and setter
 impl ModalSpinner {
     /// Gets the current state of the spinner.
-    pub fn state(&self) -> &SpinnerState {
+    pub const fn state(&self) -> &SpinnerState {
         &self.state
     }
 }
@@ -186,19 +192,10 @@ const fn test() {
 }
 
 /// Wrapper above `egui::Spinner` to be able to customize trait implementations.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq)]
 struct Spinner {
     pub size: Option<f32>,
     pub color: Option<egui::Color32>,
-}
-
-impl Default for Spinner {
-    fn default() -> Self {
-        Self {
-            size: None,
-            color: None,
-        }
-    }
 }
 
 impl Spinner {
