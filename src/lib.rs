@@ -17,10 +17,10 @@ pub enum SpinnerState {
 }
 
 /// Represents a spinner instance.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct ModalSpinner {
     state: SpinnerState,
-    id: egui::Id,
+    area: egui::Area,
 
     fill_color: egui::Color32,
     spinner: Spinner,
@@ -33,7 +33,7 @@ impl ModalSpinner {
     pub fn new() -> Self {
         Self {
             state: SpinnerState::Closed,
-            id: egui::Id::from("_modal_spinner"),
+            area: egui::Area::new(egui::Id::from("_modal_spinner")),
 
             fill_color: egui::Color32::from_rgba_premultiplied(0, 0, 0, 120),
             spinner: Spinner::default(),
@@ -43,13 +43,19 @@ impl ModalSpinner {
 
     /// Sets the ID of the spinner.
     pub fn id(mut self, id: impl Into<egui::Id>) -> Self {
-        self.id = id.into();
+        self.area = self.area.id(id.into());
         self
     }
 
     /// Sets the fill color of the modal background.
     pub fn fill_color(mut self, color: impl Into<egui::Color32>) -> Self {
         self.fill_color = color.into();
+        self
+    }
+
+    /// If the modal should fade in.
+    pub fn fade_in(mut self, fade_in: bool) -> Self {
+        self.area = self.area.fade_in(fade_in);
         self
     }
 
@@ -105,11 +111,9 @@ impl ModalSpinner {
 
         ctx.style_mut(|s| s.visuals.window_fill = self.fill_color);
 
-        let re = egui::Area::new(self.id)
-            .interactable(true)
+        let re = self.area
             .movable(false)
             .fixed_pos(screen_rect.left_top())
-            .sense(egui::Sense::click())
             .show(ctx, |ui| {
                 ui.painter()
                     .rect_filled(screen_rect, egui::Rounding::ZERO, self.fill_color);
