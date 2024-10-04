@@ -1,6 +1,8 @@
 //! egui-modal-spinner
 #![warn(missing_docs)] // Let's keep the public API well documented!
 
+use std::{ops::{Div, Sub}, time::SystemTime};
+
 use egui::Widget;
 
 /// Represents the state the spinner is currently in.
@@ -9,7 +11,9 @@ pub enum SpinnerState {
     /// The spinner is currently closed and not visible.
     Closed,
     /// The spinner is currently open and user input is suppressed.
-    Open,
+    /// The value is the timestamp when the spinner was opened
+    /// This is used to display the elapsed time.
+    Open(SystemTime),
 }
 
 /// Represents a spinner instance.
@@ -20,6 +24,7 @@ pub struct ModalSpinner {
 
     fill_color: egui::Color32,
     spinner: Spinner,
+    show_elapsed_time: bool,
 }
 
 /// Creation methods
@@ -32,6 +37,7 @@ impl ModalSpinner {
 
             fill_color: egui::Color32::from_rgba_premultiplied(0, 0, 0, 120),
             spinner: Spinner::default(),
+            show_elapsed_time: false,
         }
     }
 
@@ -52,6 +58,12 @@ impl ModalSpinner {
         self.spinner.color = Some(color.into());
         self
     }
+
+    /// If the elapsed time should be displayed below the spinner.
+    pub fn show_elapsed_time(mut self, show_elapsed_time: bool) -> Self {
+        self.show_elapsed_time = show_elapsed_time;
+        self
+    }
 }
 
 /// Getter and setter
@@ -66,7 +78,7 @@ impl ModalSpinner {
 impl ModalSpinner {
     /// Opens the spinner.
     pub fn open(&mut self) {
-       self.state = SpinnerState::Open;
+        self.state = SpinnerState::Open(SystemTime::now());
     }
 
     /// Closes the spinner.
@@ -79,7 +91,7 @@ impl ModalSpinner {
     ///
     /// This has no effect if the `SpinnerState` is currently not `SpinnerState::Open`.
     pub fn update(&mut self, ctx: &egui::Context) {
-        if self.state != SpinnerState::Open {
+        if !matches!(self.state, SpinnerState::Open(_)) {
             return;
         }
 
@@ -94,7 +106,7 @@ impl ModalSpinner {
             .fixed_size(screen_rect.size())
             .fixed_pos(screen_rect.left_top())
             .show(ctx, |ui| {
-                ui.centered_and_justified(|ui| {
+                ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
                     self.spinner.update(ui);
                 });
             });

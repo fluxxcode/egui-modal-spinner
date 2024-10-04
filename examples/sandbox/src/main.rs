@@ -1,5 +1,5 @@
-use std::thread;
 use std::sync::mpsc::{self, TryRecvError};
+use std::thread;
 
 use eframe::egui;
 
@@ -16,7 +16,6 @@ struct MyApp {
 
 impl MyApp {
     pub fn new() -> Self {
-
         Self {
             spinner: ModalSpinner::new(),
             result_recv: None,
@@ -40,12 +39,14 @@ impl MyApp {
                     ThreadState::Closed => {
                         self.spinner.close();
                         self.result_recv = None;
-                    },
+                    }
                 },
-                Err(err) => if err == TryRecvError::Disconnected {
-                    self.spinner.close();
-                    self.result_recv = None;
-                    println!("thread ended unexpectedly");
+                Err(err) => {
+                    if err == TryRecvError::Disconnected {
+                        self.spinner.close();
+                        self.result_recv = None;
+                        println!("thread ended unexpectedly");
+                    }
                 }
             }
         }
