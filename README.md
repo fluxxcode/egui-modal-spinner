@@ -1,5 +1,6 @@
 # egui-modal-spinner
 [![Latest version](https://img.shields.io/crates/v/egui-modal-spinner.svg)](https://crates.io/crates/egui-modal-spinner)
+[![Documentation](https://img.shields.io/docsrs/egui-modal-spinner)](https://docs.rs/egui-modal-spinner)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/fluxxcode/egui-modal-spinner/blob/master/LICENSE)
 
 This crate implements a modal spinner for [egui](https://github.com/emilk/egui) to suppress user input. \
