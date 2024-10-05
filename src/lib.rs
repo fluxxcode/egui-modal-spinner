@@ -5,7 +5,6 @@ use std::time::SystemTime;
 
 use egui::Widget;
 
-// TODO: Fix default modal fill color in white mode
 // TODO: Implement fade out
 // TODO: Implement progress bar
 
@@ -26,7 +25,7 @@ pub struct ModalSpinner {
     state: SpinnerState,
     area: egui::Area,
 
-    fill_color: egui::Color32,
+    fill_color: Option<egui::Color32>,
     spinner: Spinner,
     show_elapsed_time: bool,
 }
@@ -45,7 +44,7 @@ impl ModalSpinner {
             state: SpinnerState::Closed,
             area: egui::Area::new(egui::Id::from("_modal_spinner")),
 
-            fill_color: egui::Color32::from_rgba_premultiplied(0, 0, 0, 120),
+            fill_color: None,
             spinner: Spinner::default(),
             show_elapsed_time: true,
         }
@@ -59,7 +58,7 @@ impl ModalSpinner {
 
     /// Sets the fill color of the modal background.
     pub fn fill_color(mut self, color: impl Into<egui::Color32>) -> Self {
-        self.fill_color = color.into();
+        self.fill_color = Some(color.into());
         self
     }
 
@@ -136,7 +135,13 @@ impl ModalSpinner {
 
         let screen_rect = ctx.input(|i| i.screen_rect);
 
-        ctx.style_mut(|s| s.visuals.window_fill = self.fill_color);
+        let fill_color = self.fill_color.unwrap_or_else(|| {
+            if ctx.style().visuals.dark_mode {
+                egui::Color32::from_black_alpha(120)
+            } else {
+                egui::Color32::from_white_alpha(40)
+            }
+        });
 
         let re = self
             .area
@@ -144,7 +149,7 @@ impl ModalSpinner {
             .fixed_pos(screen_rect.left_top())
             .show(ctx, |ui| {
                 ui.painter()
-                    .rect_filled(screen_rect, egui::Rounding::ZERO, self.fill_color);
+                    .rect_filled(screen_rect, egui::Rounding::ZERO, fill_color);
 
                 let child_ui = egui::UiBuilder::new()
                     .max_rect(screen_rect)
