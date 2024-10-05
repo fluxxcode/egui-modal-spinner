@@ -75,13 +75,13 @@ impl ModalSpinner {
     }
 
     /// If the modal should fade in.
-    pub fn fade_in(mut self, fade_in: bool) -> Self {
+    pub const fn fade_in(mut self, fade_in: bool) -> Self {
         self.fade_in = fade_in;
         self
     }
 
     /// If the modal should fade out.
-    pub fn fade_out(mut self, fade_out: bool) -> Self {
+    pub const fn fade_out(mut self, fade_out: bool) -> Self {
         self.fade_out = fade_out;
         self
     }

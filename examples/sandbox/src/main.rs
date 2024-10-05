@@ -34,9 +34,7 @@ struct MyApp {
 impl MyApp {
     pub fn new() -> Self {
         Self {
-            spinner: ModalSpinner::new()
-                .show_elapsed_time(true)
-                .spinner_size(24.0),
+            spinner: ModalSpinner::new(),
             result_recv: None,
             thread_state: None,
         }
@@ -87,6 +85,8 @@ impl MyApp {
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        ctx.style_mut(|s| s.animation_time = 0.1);
+
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("My egui application");
             egui::widgets::global_theme_preference_buttons(ui);
