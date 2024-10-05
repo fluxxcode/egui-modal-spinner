@@ -117,8 +117,12 @@ impl ModalSpinner {
 
     /// Main update method of the spinner that should be called every frame if you want the
     /// spinner to be visible.
+    ///
     /// This method allows additional content to be displayed under the
     /// spinner - or if activated - under the elapsed time.
+    /// However, note that the additional content is not taken into account when
+    /// centering the spinner. Therefore, a large amount of additional
+    /// content on the Y-axis is not recommended.
     ///
     /// This has no effect if the `SpinnerState` is currently not `SpinnerState::Open`.
     pub fn update_with_content(&mut self, ctx: &egui::Context, ui: impl FnOnce(&mut egui::Ui)) {
@@ -156,24 +160,34 @@ impl ModalSpinner {
                     .layout(egui::Layout::top_down(egui::Align::Center));
 
                 ui.allocate_new_ui(child_ui, |ui| {
-                    let spinner_h = self
-                        .spinner
-                        .size
-                        .unwrap_or_else(|| ui.style().spacing.interact_size.y);
-
-                    ui.add_space(screen_rect.height() / 2.0 - spinner_h / 2.0);
-
-                    self.spinner.update(ui);
-
-                    if self.show_elapsed_time {
-                        self.ui_update_elapsed_time(ui);
-                    }
-
+                    self.ui_update_spinner(ui, &screen_rect);
                     content(ui);
                 });
             });
 
         ctx.move_to_top(re.response.layer_id);
+    }
+
+    fn ui_update_spinner(&self, ui: &mut egui::Ui, screen_rect: &egui::Rect) {
+        let spinner_h = self
+            .spinner
+            .size
+            .unwrap_or_else(|| ui.style().spacing.interact_size.y);
+
+        let mut margin = screen_rect.height() / 2.0 - spinner_h / 2.0;
+
+        if self.show_elapsed_time {
+            let height = ui.fonts(|f| f.row_height(&egui::TextStyle::Body.resolve(ui.style())));
+            margin -= ui.spacing().item_spacing.y.mul_add(2.0, height / 2.0);
+        }
+
+        ui.add_space(margin);
+
+        self.spinner.update(ui);
+
+        if self.show_elapsed_time {
+            self.ui_update_elapsed_time(ui);
+        }
     }
 
     fn ui_update_elapsed_time(&self, ui: &mut egui::Ui) {

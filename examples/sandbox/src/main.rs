@@ -91,7 +91,7 @@ impl eframe::App for MyApp {
             ui.heading("My egui application");
             egui::widgets::global_theme_preference_buttons(ui);
 
-            if ui.button("Do someting resource heavy!").clicked() {
+            if ui.button("Do something resource heavy!").clicked() {
                 self.exec_task();
 
                 self.spinner.open();
