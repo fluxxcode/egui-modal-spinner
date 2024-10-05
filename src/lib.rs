@@ -19,7 +19,6 @@
 //! use std::sync::mpsc;
 //! use std::thread;
 //!
-//! use eframe::egui;
 //! use egui_modal_spinner::ModalSpinner;
 //!
 //! struct MyApp {
@@ -28,51 +27,47 @@
 //! }
 //!
 //! impl MyApp {
-//!     pub fn new(_cc: &eframe::CreationContext) -> Self {
+//!     pub fn new() -> Self {
 //!         Self {
 //!             /// >>> Create a spinner instance
 //!             spinner: ModalSpinner::new(),
 //!             result_recv: None,
 //!         }
 //!     }
-//! }
 //!
-//! impl eframe::App for MyApp {
-//!     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-//!         egui::CentralPanel::default().show(ctx, |ui| {
-//!             if ui.button("Download some data").clicked() {
-//!                 // Create a new thread to execute the task
-//!                 let (tx, rx) = mpsc::channel();
-//!                 self.result_recv = Some(rx);
+//!     pub fn update(&mut self, ctx: &egui::Context, ui: &mut egui::Ui) {
+//!         if ui.button("Download some data").clicked() {
+//!             // Create a new thread to execute the task
+//!             let (tx, rx) = mpsc::channel();
+//!             self.result_recv = Some(rx);
 //!
-//!                 thread::spawn(move || {
-//!                     // Do some heavy resource task
-//!                     thread::sleep(std::time::Duration::from_secs(5));
+//!             thread::spawn(move || {
+//!                 // Do some heavy resource task
+//!                 thread::sleep(std::time::Duration::from_secs(5));
 //!
-//!                     // Send some thread status to the receiver
-//!                     let _ = tx.send(true);
-//!                 });
+//!                 // Send some thread status to the receiver
+//!                 let _ = tx.send(true);
+//!             });
 //!
-//!                 // >>> Open the spinner
-//!                 self.spinner.open();
+//!             // >>> Open the spinner
+//!             self.spinner.open();
+//!         }
+//!
+//!         if let Some(rx) = &self.result_recv {
+//!             if let Ok(_) = rx.try_recv() {
+//!                 // >>> Close the spinner when the thread finishes executing the task
+//!                 self.spinner.close()
 //!             }
+//!         }
 //!
-//!             if let Some(rx) = &self.result_recv {
-//!                 if let Ok(_) = rx.try_recv() {
-//!                     // >>> Close the spinner when the thread finishes executing the task
-//!                     self.spinner.close()
-//!                 }
-//!             }
+//!         // >>> Update the spinner
+//!         self.spinner.update(ctx);
 //!
-//!             // >>> Update the spinner
-//!             self.spinner.update(ctx);
-//!
-//!             // Alternatively, you can also display your own UI below the spinner.
-//!             // This is useful when you want to display the status of the currently running task.
-//!             self.spinner.update_with_content(ctx, |ui| {
-//!                 ui.label("Downloading some data...");
-//!             })
-//!         });
+//!         // Alternatively, you can also display your own UI below the spinner.
+//!         // This is useful when you want to display the status of the currently running task.
+//!         self.spinner.update_with_content(ctx, |ui| {
+//!             ui.label("Downloading some data...");
+//!         })
 //!     }
 //! }
 //! ```
