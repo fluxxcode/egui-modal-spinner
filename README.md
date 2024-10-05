@@ -34,6 +34,7 @@ struct MyApp {
 impl MyApp {
     pub fn new(_cc: &eframe::CreationContext) -> Self {
         Self {
+            /// >>> Create a spinner instance
             spinner: ModalSpinner::new(),
             result_recv: None,
         }
@@ -72,10 +73,9 @@ impl eframe::App for MyApp {
 
             // Alternatively, you can also display your own UI below the spinner.
             // This is useful when you want to display the status of the currently running task.
-
-            // self.spinner.update_with_content(ctx, |ui| {
-            //     ui.label("Downloading some data...");
-            // })
+            self.spinner.update_with_content(ctx, |ui| {
+                ui.label("Downloading some data...");
+            })
         });
     }
 }
