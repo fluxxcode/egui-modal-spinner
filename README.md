@@ -6,6 +6,8 @@ This crate implements a modal spinner for [egui](https://github.com/emilk/egui) 
 This is useful, for example, when performing resource-intensive tasks that do
 not require the user to interact with the application.
 
+![Demo](media/demo.gif)
+
 # Example
 See [sandbox](https://github.com/fluxxcode/egui-modal-spinner/tree/master/examples/sandbox) for the full example.
 
