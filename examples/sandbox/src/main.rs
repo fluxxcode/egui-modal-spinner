@@ -19,7 +19,7 @@ impl Display for ThreadState {
         match self {
             Self::LoadingA => write!(f, "Loading dogs 🐕 ..."),
             Self::LoadingB => write!(f, "Loading cats 🐈 ..."),
-            Self::LoadingC => write!(f, "Loading pengiuns 🐧 ..."),
+            Self::LoadingC => write!(f, "Loading penguins 🐧 ..."),
             Self::Finished => write!(f, "Finished"),
         }
     }
