@@ -5,28 +5,36 @@ use std::time::SystemTime;
 
 use egui::Widget;
 
-// TODO: Implement fade out
-// TODO: Implement progress bar
-
 /// Represents the state the spinner is currently in.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SpinnerState {
     /// The spinner is currently closed and not visible.
     Closed,
     /// The spinner is currently open and user input is suppressed.
-    /// The value is the timestamp when the spinner was opened
-    /// This is used to display the elapsed time.
-    Open(SystemTime),
+    Open,
 }
 
 /// Represents a spinner instance.
 #[derive(Debug, Clone)]
 pub struct ModalSpinner {
+    /// Represents the state of the spinner.
     state: SpinnerState,
-    area: egui::Area,
+    /// If the modal is closed but currently fading out.
+    fading_out: bool,
+    /// Timestamp when the spinner was opened.
+    timestamp: SystemTime,
 
+    /// The ID of the modal area. If None, a default is used.
+    id: Option<egui::Id>,
+    /// The fill color of the modal background.
     fill_color: Option<egui::Color32>,
+    /// If the modal window should fade in when opening.
+    fade_in: bool,
+    /// If the modal should fade out when closing.
+    fade_out: bool,
+    /// Configuration of the spinner.
     spinner: Spinner,
+    /// If the time elapsed since opening should be displayed under the spinner.
     show_elapsed_time: bool,
 }
 
@@ -42,9 +50,13 @@ impl ModalSpinner {
     pub fn new() -> Self {
         Self {
             state: SpinnerState::Closed,
-            area: egui::Area::new(egui::Id::from("_modal_spinner")),
+            fading_out: false,
+            timestamp: SystemTime::now(),
 
+            id: None,
             fill_color: None,
+            fade_in: true,
+            fade_out: true,
             spinner: Spinner::default(),
             show_elapsed_time: true,
         }
@@ -52,7 +64,7 @@ impl ModalSpinner {
 
     /// Sets the ID of the spinner.
     pub fn id(mut self, id: impl Into<egui::Id>) -> Self {
-        self.area = self.area.id(id.into());
+        self.id = Some(id.into());
         self
     }
 
@@ -64,7 +76,13 @@ impl ModalSpinner {
 
     /// If the modal should fade in.
     pub fn fade_in(mut self, fade_in: bool) -> Self {
-        self.area = self.area.fade_in(fade_in);
+        self.fade_in = fade_in;
+        self
+    }
+
+    /// If the modal should fade out.
+    pub fn fade_out(mut self, fade_out: bool) -> Self {
+        self.fade_out = fade_out;
         self
     }
 
@@ -99,12 +117,14 @@ impl ModalSpinner {
 impl ModalSpinner {
     /// Opens the spinner.
     pub fn open(&mut self) {
-        self.state = SpinnerState::Open(SystemTime::now());
+        self.state = SpinnerState::Open;
+        self.timestamp = SystemTime::now();
     }
 
     /// Closes the spinner.
     pub fn close(&mut self) {
         self.state = SpinnerState::Closed;
+        self.fading_out = self.fade_out;
     }
 
     /// Main update method of the spinner that should be called every frame if you want the
@@ -132,26 +152,42 @@ impl ModalSpinner {
 
 /// UI methods
 impl ModalSpinner {
-    fn update_ui(&self, ctx: &egui::Context, content: impl FnOnce(&mut egui::Ui)) {
-        if !matches!(self.state, SpinnerState::Open(_)) {
+    fn update_ui(&mut self, ctx: &egui::Context, content: impl FnOnce(&mut egui::Ui)) {
+        if self.state != SpinnerState::Open && !self.fading_out {
             return;
         }
 
+        let id = self.id.unwrap_or_else(|| egui::Id::from("_modal_spinner"));
         let screen_rect = ctx.input(|i| i.screen_rect);
 
-        let fill_color = self.fill_color.unwrap_or_else(|| {
-            if ctx.style().visuals.dark_mode {
-                egui::Color32::from_black_alpha(120)
-            } else {
-                egui::Color32::from_white_alpha(40)
-            }
-        });
+        let opacity = ctx.animate_bool_with_easing(
+            id.with("fade_out"),
+            self.state == SpinnerState::Open,
+            egui::emath::easing::cubic_out,
+        );
 
-        let re = self
-            .area
+        if opacity <= 0.0 && self.fading_out {
+            self.fading_out = false;
+            return;
+        }
+
+        let re = egui::Area::new(id)
             .movable(false)
             .fixed_pos(screen_rect.left_top())
+            .fade_in(self.fade_in)
             .show(ctx, |ui| {
+                if self.fading_out {
+                    ui.multiply_opacity(opacity);
+                }
+
+                let fill_color = self.fill_color.unwrap_or_else(|| {
+                    if ctx.style().visuals.dark_mode {
+                        egui::Color32::from_black_alpha(120)
+                    } else {
+                        egui::Color32::from_white_alpha(40)
+                    }
+                });
+
                 ui.painter()
                     .rect_filled(screen_rect, egui::Rounding::ZERO, fill_color);
 
@@ -191,13 +227,11 @@ impl ModalSpinner {
     }
 
     fn ui_update_elapsed_time(&self, ui: &mut egui::Ui) {
-        if let SpinnerState::Open(timestamp) = self.state {
-            ui.add_space(ui.spacing().item_spacing.y);
-            ui.label(format!(
-                "Elapsed: {} s",
-                timestamp.elapsed().unwrap_or_default().as_secs()
-            ));
-        }
+        ui.add_space(ui.spacing().item_spacing.y);
+        ui.label(format!(
+            "Elapsed: {} s",
+            self.timestamp.elapsed().unwrap_or_default().as_secs()
+        ));
     }
 }
 
