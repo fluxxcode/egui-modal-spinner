@@ -261,6 +261,7 @@ impl ModalSpinner {
 
         let re = egui::Area::new(id)
             .movable(false)
+            .interactable(false)
             .fixed_pos(screen_rect.left_top())
             .fade_in(self.fade_in)
             .show(ctx, |ui| {
