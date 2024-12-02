@@ -261,6 +261,7 @@ impl ModalSpinner {
 
         let re = egui::Area::new(id)
             .movable(false)
+            .interactable(true)
             .fixed_pos(screen_rect.left_top())
             .fade_in(self.fade_in)
             .show(ctx, |ui| {
@@ -278,6 +279,8 @@ impl ModalSpinner {
 
                 ui.painter()
                     .rect_filled(screen_rect, egui::Rounding::ZERO, fill_color);
+
+                ui.allocate_response(screen_rect.size(), egui::Sense::click());
 
                 let child_ui = egui::UiBuilder::new()
                     .max_rect(screen_rect)
