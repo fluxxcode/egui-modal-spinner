@@ -17,8 +17,8 @@ The following example shows the basic use of the spinner with [eframe](https://g
 Cargo.toml:
 ```toml
 [dependencies]
-eframe = "0.29"
-egui-modal-spinner = "0.1.0"
+eframe = "0.30"
+egui-modal-spinner = "0.2.0"
 ```
 
 main.rs:
