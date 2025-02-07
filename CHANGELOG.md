@@ -1,5 +1,11 @@
 # egui-modal-spinner changelog
 
+## 2025-02-07 - v0.3.0 - egui update
+
+### 🚨 Breaking Changes
+
+- Updated `egui` from `0.30.0` to `0.31.0` [#13](https://github.com/fluxxcode/egui-modal-spinner/pull/13)
+
 ## 2025-01-20 - v0.2.0 - egui update
 
 ### 🚨 Breaking Changes
