@@ -2,7 +2,7 @@
 members = ["examples/*"]
 
 [workspace.dependencies]
-eframe = { version = "0.30.0", default-features = false, features = [
+eframe = { version = "0.31.0", default-features = false, features = [
     "glow",
     "persistence",
     "x11",
@@ -21,7 +21,7 @@ readme = "README.md"
 license = "MIT"
 
 [dependencies]
-egui = "0.30.0"
+egui = "0.31.0"
 
 [lints.rust]
 unsafe_code = "forbid"

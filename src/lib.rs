@@ -278,7 +278,7 @@ impl ModalSpinner {
                 });
 
                 ui.painter()
-                    .rect_filled(screen_rect, egui::Rounding::ZERO, fill_color);
+                    .rect_filled(screen_rect, egui::CornerRadius::ZERO, fill_color);
 
                 ui.allocate_response(screen_rect.size(), egui::Sense::click());
 
